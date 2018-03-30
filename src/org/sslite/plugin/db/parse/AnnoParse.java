@@ -89,21 +89,19 @@ class AnnoParse {
 		return tableInfo;
 	}
 	
-//	public static <T> Field getPkValue(T obj) {
-//		Field[] fields = obj.getClass().getDeclaredFields();
-//		for (int i = 0; i < fields.length; i++) {
-//			Field field = fields[i];
-//			field.setAccessible(true);
-//			Column column = field.getAnnotation(Column.class);
-//			if(column!=null){
-//				PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-//				if (primaryKey != null) {
-//					return field;
-//				}
-//			}
-//		}
-//		return null;
-//	}
+	public static <T> String getTableName(Class<?> clazz) {
+		Table table = (Table) clazz.getAnnotation(Table.class);
+		if(table==null){
+			return null;
+		}
+		String tableName = null;
+		if (TextUtils.isEmpty(table.name())) {
+			tableName = clazz.getName();
+		} else {
+			tableName = table.name();
+		}
+		return tableName;
+	}
 	
 	
 	/**

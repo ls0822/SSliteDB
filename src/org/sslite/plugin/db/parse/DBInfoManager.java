@@ -11,10 +11,10 @@ import org.sslite.plugin.db.model.ContantValue;
 import org.sslite.plugin.db.model.DBValues;
 import org.sslite.plugin.db.model.DataType;
 import org.sslite.plugin.db.model.TableInfo;
+import org.sslite.plugin.log.LLog;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.util.Log;
 
 /**
  * 主要用于数据的封住
@@ -63,9 +63,10 @@ public class DBInfoManager {
 		}
 
 		Class<?> clazz = ReflectUtils.getClazzByObj(obj);
-		String name = clazz.getName();
-		if (tablesInfo.containsKey(name)) {
-			return tablesInfo.get(name);
+		String tableName = AnnoParse.getTableName(clazz);
+		String key = clazz.getName()+ tableName;
+		if (tablesInfo.containsKey(key)) {
+			return tablesInfo.get(key);
 		}
 
 		TableInfo tableInfo = initTable(clazz);
@@ -73,7 +74,7 @@ public class DBInfoManager {
 			return null;
 		}
 
-		tablesInfo.put(name, tableInfo);
+		tablesInfo.put(key, tableInfo);
 		return tableInfo;
 	}
 
@@ -86,18 +87,21 @@ public class DBInfoManager {
 		if (tablesInfo == null) {
 			tablesInfo = new HashMap<String, TableInfo>();
 		}
-		String name = clazz.getName();
-		if (tablesInfo.containsKey(name)) {
-			return tablesInfo.get(name);
+		
+		String tableName = AnnoParse.getTableName(clazz);
+		
+		String key = clazz.getName()+ tableName;
+		if (tablesInfo.containsKey(key)) {
+			return tablesInfo.get(key);
 		}
 		long time = System.currentTimeMillis();
 		TableInfo tableInfo = initTable(clazz);
-		Log.d("SqliteDao", "initTable time = >" + (System.currentTimeMillis() - time));
+		LLog.d("initTable time = >" + (System.currentTimeMillis() - time));
 		if (tableInfo == null) {
 			return null;
 		}
 
-		tablesInfo.put(name, tableInfo);
+		tablesInfo.put(key, tableInfo);
 		return tableInfo;
 	}
 
