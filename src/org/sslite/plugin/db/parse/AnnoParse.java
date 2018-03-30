@@ -12,6 +12,7 @@ import org.sslite.plugin.db.model.DataType;
 import org.sslite.plugin.db.model.TableInfo;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 
 /**
@@ -20,6 +21,8 @@ import android.text.TextUtils;
  *
  */
 class AnnoParse {
+	private static final String TAG = "AnnoParse";
+
 	/**
 	 * 初始化table 的信息
 	 * @param clazz
@@ -39,7 +42,7 @@ class AnnoParse {
 		}
 		
 		HashMap<String, ColumnInfo> columnMaps = null;
-//		HashMap<String, String> feildmaps =  null;
+		HashMap<String, String> feildmaps =  null;
 		Field[] fields = clazz.getDeclaredFields();
 		for (int i = 0; i < fields.length; i++) {
 			Field field = fields[i];
@@ -62,29 +65,45 @@ class AnnoParse {
 				columnInfo.columLength = column.length();
 				
 				//数据库 对应的列类型
-				columnInfo.dbtype = getType(column.getClass(), columnInfo.fieldtype);
+				columnInfo.dbtype = getType(field.getType(), columnInfo.fieldtype);
 				
 				if (columnMaps == null) {
 					columnMaps = new HashMap<String, ColumnInfo>();
 				}
-//				if (feildmaps == null) {
-//					feildmaps = new HashMap<String, String>();
-//				}
+				if (feildmaps == null) {
+					feildmaps = new HashMap<String, String>();
+				}
 				
 				columnMaps.put(columnInfo.columName, columnInfo);
-//				feildmaps.put(columnInfo.fieldName, columnInfo.columName);
+				feildmaps.put(columnInfo.fieldName, columnInfo.columName);
 				
 				PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
 				if (primaryKey != null) {
-					tableInfo.primaryKey = columnInfo.fieldName;
+					tableInfo.primaryKey = columnInfo.columName;
 					columnInfo.isPrimaryKey = true;
 				}
 			}
 		}
-//		tableInfo.fieldMap = feildmaps;
+		tableInfo.fieldMap = feildmaps;
 		tableInfo.colunmMap = columnMaps;
 		return tableInfo;
 	}
+	
+//	public static <T> Field getPkValue(T obj) {
+//		Field[] fields = obj.getClass().getDeclaredFields();
+//		for (int i = 0; i < fields.length; i++) {
+//			Field field = fields[i];
+//			field.setAccessible(true);
+//			Column column = field.getAnnotation(Column.class);
+//			if(column!=null){
+//				PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
+//				if (primaryKey != null) {
+//					return field;
+//				}
+//			}
+//		}
+//		return null;
+//	}
 	
 	
 	/**

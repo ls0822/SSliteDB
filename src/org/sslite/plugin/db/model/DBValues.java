@@ -52,4 +52,11 @@ public class DBValues {
 			values.clear();
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "DBValues [orderColums=" + orderColums + ", values=" + values + "]";
+	}
+	
+	
 }

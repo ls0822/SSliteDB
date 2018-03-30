@@ -3,120 +3,87 @@ package org.sslite.plugin.db;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sslite.plugin.db.exception.NotFindTableInfoException;
-import org.sslite.plugin.db.model.DBValues;
 import org.sslite.plugin.db.model.OrderBy;
-import org.sslite.plugin.db.model.TableInfo;
-import org.sslite.plugin.db.parse.DBInfoManager;
-import org.sslite.plugin.db.sql.SQLCreator;
-import org.sslite.plugin.db.sqlite.SqliteDao;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.CancellationSignal;
 
-class SSliteImp extends SqliteDao implements SSlite {	
+class SSliteImp implements SSlite {
 	
-	private DBInfoManager dbInfo = new DBInfoManager();
-	private SQLCreator sqlCreator = new SQLCreator();
+	SSliteService sslite;
 	
 	public SSliteImp(Context context, String dbName, int dbVersion) {
-		super(context, dbName, dbVersion);
+		sslite = new SSliteService(context, dbName, dbVersion);
 	}
-	
-	@Override
-	protected void upgrade(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	private boolean checkCreateTable(TableInfo tableInfo) {
-		if (dbInfo.getTablesInfo() == null) {
-			return false;
-		}
-		return create(sqlCreator.createTables(dbInfo.getTablesInfo()));
-	}
-	
 
 	@Override
-	public boolean insert(Object obj) {
-		TableInfo tableInfo = dbInfo.getTableInfo(obj);
-		if (tableInfo == null) {
-			throw new NotFindTableInfoException("table is null, please check your"+obj.getClass().getName());
-		}
-		if (checkCreateTable(tableInfo)) {
-			throw new RuntimeException("table is null, please check your"+obj.getClass().getName());
-		}
-		
-		ArrayList objs = new ArrayList();
+	public <T> boolean insert(T obj) {
+		List<T> objs = new ArrayList<T>();
 		objs.add(obj);
-		DBValues dbValues = dbInfo.getBatchContentValues(tableInfo, objs);
-		List<String> sqls = sqlCreator.insert(tableInfo, dbValues);
-		
-		return insert(sqls);
+		return sslite.insert(objs);
 	}
 
 	@Override
 	public <T> boolean batchInsert(List<T> objs) {
-		TableInfo tableInfo = dbInfo.getTableInfo(objs.get(0));
-		if (tableInfo == null) {
-			throw new NotFindTableInfoException("table is null, please check your" + objs.get(0).getClass().getName());
-		}
-		if (checkCreateTable(tableInfo)) {
-			throw new RuntimeException("table is null, please check your " + objs.get(0).getClass().getName());
-		}
-		
-		DBValues dbValues = dbInfo.getBatchContentValues(tableInfo, objs);
-		List<String> sqls = sqlCreator.insert(tableInfo, dbValues);
-		
-		return insert(sqls);
+		return sslite.insert(objs);
 	}
 
 	@Override
-	public boolean delete(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
+	public <T> boolean delete(T obj) {
+		List<T> objs = new ArrayList<T>();
+		objs.add(obj);
+		return sslite.delete(objs);
 	}
 
 	@Override
-	public boolean batchDelete(List<Object> objs) {
-		// TODO Auto-generated method stub
-		return false;
+	public <T> boolean batchDelete(List<T> objs) {
+		return sslite.delete(objs);
 	}
 
 	@Override
-	public void deleteOrderDatas(Class<?> clazz, long count, OrderBy orderBy) {
-		// TODO Auto-generated method stub
-
+	public boolean deleteOrderDatas(Class<?> clazz, long count, OrderBy orderBy) {
+		return sslite.deleteOrderDatas(clazz, count, orderBy);
 	}
 
 	@Override
-	public boolean update(Object obj) {
-		// TODO Auto-generated method stub
-		return false;
+	public <T> boolean update(T obj) {
+		List<T> objs = new ArrayList<T>();
+		objs.add(obj);
+		return sslite.update(objs);
+	}
+	
+	@Override
+	public <T> boolean batchUpdate(List<T> objs) {
+		return sslite.update(objs);
 	}
 
 	@Override
-	public <T> List<T> find(Class<T> clazz, String sql, String[] selectionArgs) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> boolean find(T obj) {
+		return sslite.find(obj);
+	}
+
+	@Override
+	public <T> List<T> findAll(Class<T> clazz) {
+		return sslite.find(clazz, null, -1, -1);
+	}
+
+	@Override
+	public <T> List<T> find(Class<T> clazz, OrderBy orderBy, int limitStart, int limitSize) {
+		return sslite.find(clazz, orderBy, limitStart, limitSize);
 	}
 
 	@Override
 	public <T> List<T> find(Class<T> clazz, boolean distinct, String[] columns, String selection,
 			String[] selectionArgs, String groupBy, String having, String orderBy, String limit,
 			CancellationSignal cancellationSignal) {
-		// TODO Auto-generated method stub
-		return null;
+		return sslite.find(clazz, distinct, columns, selection, selectionArgs, groupBy, having, orderBy, limit, cancellationSignal);
 	}
 
 	@Override
 	public long queryDataCount(Class<?> clazz) {
-		// TODO Auto-generated method stub
-		return 0;
+		return sslite.queryDataCount(clazz);
 	}
-
 	
-
+	
+	
 }

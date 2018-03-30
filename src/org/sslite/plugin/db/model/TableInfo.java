@@ -13,17 +13,21 @@ public class TableInfo {
 	public String tableName ;
 	public String primaryKey;
 	public HashMap<String, ColumnInfo> colunmMap;//数据库的列名与列信息的映射
-//	public HashMap<String, String> fieldMap;//字段名与列名的映射
+	public HashMap<String, String> fieldMap;//字段名与列名的映射
 //	public List<String> columnOrder;//字段名与列名的映射
 	
 //	public List<ContentValues> contentValues;
 	
 	
-	public ColumnInfo getColumn(String fieldName){
-		if(colunmMap==null){
+	public ColumnInfo getColumnByFieldName(String fieldName){
+		if(colunmMap==null || fieldMap == null){
 			return null;
 		}
-		return colunmMap.get(fieldName);
+		String colunmName = fieldMap.get(fieldName);
+		if (TextUtils.isEmpty(colunmName)) {
+			return null;
+		}
+		return colunmMap.get(colunmName);
 	}
 	
 	public ColumnInfo getColumnByColunmName(String colunmName){
